@@ -26,7 +26,7 @@ interface Ticket {
 function App() {
   const [number, setNumber] = useState<string>("");
   const [count, setCount] = useState<string>("");
-  const [numbersArray, setNumbersArray] = useState<number[]>([]);
+  const [numbersArray, setNumbersArray] = useState<string[]>([]);
   const [message, setMessage] = useState<string>("");
   const [totalCount, setTotalCount] = useState<number>(0); // متغیر جمع تعداد نفرات
   const listRef = useRef<HTMLDivElement>(null);
@@ -34,12 +34,12 @@ function App() {
   const audio1 = new Audio("/error.mp3");
   const ok = new Audio("/message_sent.mp3");
   const checkAndAddNumber = (): void => {
-    const parsedNumber: number = parseInt(number);
+    const parsedNumber: string = number;
 
-    if (isNaN(parsedNumber)) {
-      setMessage("لطفاً یک عدد معتبر وارد کنید!");
-      return;
-    }
+    // if (isNaN(parsedNumber)) {
+    //   setMessage("لطفاً یک عدد معتبر وارد کنید!");
+    //   return;
+    // }
 
     if (numbersArray.some((item) => item === parsedNumber)) {
       audio1?.play();
@@ -88,7 +88,7 @@ function App() {
     }
   };
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="sm" sx={{ backgroundColor: "yellow" }}>
       <Box
         display="flex"
         width={1}
