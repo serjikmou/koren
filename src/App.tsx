@@ -1,4 +1,11 @@
-import { Box, Button, Input, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  Input,
+  TextField,
+  Typography,
+} from "@mui/material";
 import React, { useState, useRef, useEffect } from "react";
 import { QrScanner } from "@yudiel/react-qr-scanner";
 
@@ -19,7 +26,7 @@ interface Ticket {
 function App() {
   const [number, setNumber] = useState<string>("");
   const [count, setCount] = useState<string>("");
-  const [numbersArray, setNumbersArray] = useState<Ticket[]>([]);
+  const [numbersArray, setNumbersArray] = useState<number[]>([]);
   const [message, setMessage] = useState<string>("");
   const [totalCount, setTotalCount] = useState<number>(0); // متغیر جمع تعداد نفرات
   const listRef = useRef<HTMLDivElement>(null);
@@ -27,22 +34,18 @@ function App() {
   const audio1 = new Audio("/error.mp3");
   const checkAndAddNumber = (): void => {
     const parsedNumber: number = parseInt(number);
-    const parsedCount: number = parseInt(count);
 
-    if (isNaN(parsedNumber) || isNaN(parsedCount)) {
+    if (isNaN(parsedNumber)) {
       setMessage("لطفاً یک عدد معتبر وارد کنید!");
       return;
     }
 
-    if (numbersArray.some((item: Ticket) => item.number === parsedNumber)) {
+    if (numbersArray.some((item) => item === parsedNumber)) {
       audio1?.play();
       swal("قبلا وارد شده است", "جهت ادامه کلیک کنید", "error");
       setMessage("این عدد و تعداد در آرایه وجود دارد!");
     } else {
-      setNumbersArray([
-        ...numbersArray,
-        { number: parsedNumber, count: parsedCount },
-      ]);
+      setNumbersArray([...numbersArray, parsedNumber]);
       audio?.play();
       swal("با موفقیت اضافه شد", "جهت ادامه کلیک کنید", "success");
       setMessage("عدد و تعداد با موفقیت به آرایه اضافه شد!");
@@ -71,15 +74,15 @@ function App() {
     setNumbersArray(parsedNumbersArray || [{ number: 0, count: 0 }]);
   }, []);
   // محاسبه مجموع تعداد نفرات
-  useEffect(() => {
-    const sum = numbersArray.reduce((total, item) => total + item.count, 0);
-    setTotalCount(sum);
+  // useEffect(() => {
+  //   const sum = numbersArray.reduce((total, item) => total + item.count, 0);
+  //   setTotalCount(sum);
 
-    // اسکرول به پایین لیست
-    if (listRef.current) {
-      listRef.current.scrollTop = listRef.current.scrollHeight;
-    }
-  }, [numbersArray]);
+  //   // اسکرول به پایین لیست
+  //   if (listRef.current) {
+  //     listRef.current.scrollTop = listRef.current.scrollHeight;
+  //   }
+  // }, [numbersArray]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -87,103 +90,86 @@ function App() {
     }
   };
   return (
-    <Box
-      display="flex"
-      width={1}
-      height={"100vh"}
-      justifyContent={"space-around"}
-    >
+    <Container maxWidth="sm">
       <Box
-        mt={4}
-        width={3 / 4}
-        maxHeight={"700px"}
-        sx={{ overflowY: "auto" }}
-        ref={listRef}
+        display="flex"
+        width={1}
+        flexDirection={"column"}
+        height={"100vh"}
+        justifyContent={"space-around"}
       >
-        {numbersArray.length !== 0 && (
-          <div style={{ width: "50%" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                fontWeight: "bold",
-                marginBottom: "8px",
-                borderBottom: "1px solid black",
-              }}
-            >
-              <div style={{ fontFamily: "Trafik" }}>بارکد</div>
-              <div style={{ fontFamily: "Trafik" }}>تعداد نفرات</div>
-              <div style={{ fontFamily: "Trafik" }}>عملیات</div>
-            </div>
-            {numbersArray.map((item: Ticket, index: number) => (
-              <div
-                key={index}
-                style={{
+        <Box width={"200px"} height={"200px"}>
+          <QrScanner
+            onDecode={(result) => setNumber(result)}
+            onError={(error) => console.log(error?.message)}
+          />
+        </Box>
+
+        <Box display={"flex"} flexDirection={"column"} mt={5}>
+          <Typography sx={{ fontSize: "20px", mb: 1, fontFamily: "Trafik" }}>
+            سامانه بلیط کرن بند
+          </Typography>
+          <TextField
+            id="outlined-basic"
+            label="بارکد"
+            value={number}
+            onChange={(e) => setNumber(e.target.value)}
+            variant="outlined"
+            autoComplete="off"
+            sx={{ mb: 1, fontFamily: "Trafik" }}
+          />
+          <Button
+            sx={{ mt: 1, fontFamily: "Trafik" }}
+            variant="contained"
+            onClick={checkAndAddNumber}
+          >
+            استعلام
+          </Button>
+          <Typography sx={{ mb: 1, fontFamily: "Trafik" }}>
+            مجموع تعداد بلیط ها: {numbersArray.length}
+          </Typography>{" "}
+        </Box>
+        <Box mt={4} sx={{ overflowY: "auto" }}>
+          {numbersArray.length !== 0 && (
+            <Box overflow={"auto"}>
+              <Box
+                sx={{
                   display: "flex",
                   justifyContent: "space-between",
-                  alignItems: "center",
+                  fontWeight: "bold",
                   marginBottom: "8px",
                   borderBottom: "1px solid black",
                 }}
               >
-                <div style={{ fontFamily: "Trafik" }}>{item.number}</div>
-                <div style={{ fontFamily: "Trafik" }}>{item.count}</div>
-                <Button
-                  variant="contained"
-                  onClick={() => removeTicket(index)}
-                  sx={{ fontFamily: "Trafik", mb: 1 }}
+                <Box sx={{ fontFamily: "Trafik" }}>بارکد</Box>
+                <Box sx={{ fontFamily: "Trafik" }}>عملیات</Box>
+              </Box>
+              {numbersArray.map((item: any, index: number) => (
+                <Box
+                  key={index}
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "8px",
+                    borderBottom: "1px solid black",
+                  }}
                 >
-                  حذف
-                </Button>
-              </div>
-            ))}
-          </div>
-        )}
+                  <Box style={{ fontFamily: "Trafik" }}>{item}</Box>
+                  <Button
+                    variant="contained"
+                    onClick={() => removeTicket(index)}
+                    sx={{ fontFamily: "Trafik", mb: 1 }}
+                  >
+                    حذف
+                  </Button>
+                </Box>
+              ))}
+            </Box>
+          )}
+        </Box>
       </Box>
-      <Box display={"flex"} flexDirection={"column"} ml={5} mt={5}>
-        <Typography sx={{ fontSize: "20px", mb: 1, fontFamily: "Trafik" }}>
-          سامانه بلیط کرن بند
-        </Typography>
-        <TextField
-          id="outlined-basic"
-          label="بارکد"
-          value={number}
-          onChange={(e) => setNumber(e.target.value)}
-          variant="outlined"
-          autoComplete="off"
-          sx={{ mb: 1, fontFamily: "Trafik" }}
-        />
-        <TextField
-          id="outlined-basic"
-          label="تعداد نفر"
-          value={count}
-          onChange={(e) => setCount(e.target.value)}
-          variant="outlined"
-          autoComplete="off"
-          sx={{ fontFamily: "Trafik" }}
-          onKeyDown={handleKeyDown}
-        />
-        <Button
-          sx={{ mt: 1, fontFamily: "Trafik" }}
-          variant="contained"
-          onClick={checkAndAddNumber}
-        >
-          استعلام
-        </Button>
-        <Typography sx={{ mb: 1, fontFamily: "Trafik" }}>
-          مجموع تعداد نفرات: {totalCount}
-        </Typography>{" "}
-        <Typography sx={{ mb: 1, fontFamily: "Trafik" }}>
-          مجموع تعداد بلیط ها: {numbersArray.length}
-        </Typography>{" "}
-      </Box>
-      <Box width={"400px"} height={"500px"}>
-        <QrScanner
-          onDecode={(result) => setNumber(result)}
-          onError={(error) => console.log(error?.message)}
-        />{" "}
-      </Box>
-    </Box>
+    </Container>
   );
 }
 
