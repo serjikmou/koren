@@ -32,6 +32,7 @@ function App() {
   const listRef = useRef<HTMLDivElement>(null);
   const audio = new Audio("/News-Ting.mp3");
   const audio1 = new Audio("/error.mp3");
+  const ok = new Audio("/message_sent.mp3");
   const checkAndAddNumber = (): void => {
     const parsedNumber: number = parseInt(number);
 
@@ -74,15 +75,12 @@ function App() {
     setNumbersArray(parsedNumbersArray || [{ number: 0, count: 0 }]);
   }, []);
   // محاسبه مجموع تعداد نفرات
-  // useEffect(() => {
-  //   const sum = numbersArray.reduce((total, item) => total + item.count, 0);
-  //   setTotalCount(sum);
-
-  //   // اسکرول به پایین لیست
-  //   if (listRef.current) {
-  //     listRef.current.scrollTop = listRef.current.scrollHeight;
-  //   }
-  // }, [numbersArray]);
+  useEffect(() => {
+    // اسکرول به پایین لیست
+    if (listRef.current) {
+      listRef.current.scrollTop = listRef.current.scrollHeight;
+    }
+  }, [numbersArray]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -98,15 +96,35 @@ function App() {
         height={"100vh"}
         justifyContent={"space-around"}
       >
-        <Box width={"200px"} height={"200px"}>
-          <QrScanner
-            onDecode={(result) => setNumber(result)}
-            onError={(error) => console.log(error?.message)}
-          />
+        <Box
+          display={"flex"}
+          justifyContent={"center"}
+          flexDirection={"column"}
+          alignItems={"center"}
+        >
+          <Typography sx={{ fontSize: "20px", mb: 1, fontFamily: "Trafik" }}>
+            برنامه نویس سیدسجاد موسوی
+          </Typography>
+          <Box width={"200px"} height={"200px"}>
+            <QrScanner
+              onDecode={(result) => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+                setNumber(result), ok.play();
+              }}
+              onError={(error) => console.log(error?.message)}
+            />
+          </Box>
         </Box>
 
         <Box display={"flex"} flexDirection={"column"} mt={5}>
-          <Typography sx={{ fontSize: "20px", mb: 1, fontFamily: "Trafik" }}>
+          <Typography
+            sx={{
+              fontSize: "20px",
+              mb: 1,
+              fontFamily: "Trafik",
+              textAlign: "center",
+            }}
+          >
             سامانه بلیط کرن بند
           </Typography>
           <TextField
@@ -125,11 +143,11 @@ function App() {
           >
             استعلام
           </Button>
-          <Typography sx={{ mb: 1, fontFamily: "Trafik" }}>
+          <Typography sx={{ mb: 1, fontFamily: "Trafik", textAlign: "center" }}>
             مجموع تعداد بلیط ها: {numbersArray.length}
           </Typography>{" "}
         </Box>
-        <Box mt={4} sx={{ overflowY: "auto" }}>
+        <Box mt={4} sx={{ overflowY: "auto" }} ref={listRef}>
           {numbersArray.length !== 0 && (
             <Box overflow={"auto"}>
               <Box
