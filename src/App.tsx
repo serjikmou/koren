@@ -18,11 +18,6 @@ import {
 } from "@mui/material";
 import swal from "sweetalert";
 
-interface Ticket {
-  number: number;
-  count: number;
-}
-
 function App() {
   const [number, setNumber] = useState<string>("");
   const [count, setCount] = useState<string>("");
@@ -72,7 +67,8 @@ function App() {
     const parsedNumbersArray = storedNumbersArray
       ? JSON.parse(storedNumbersArray)
       : [];
-    setNumbersArray(parsedNumbersArray || [{ number: 0, count: 0 }]);
+
+    setNumbersArray(parsedNumbersArray || []);
   }, []);
   // محاسبه مجموع تعداد نفرات
   useEffect(() => {
@@ -105,7 +101,7 @@ function App() {
           <Typography sx={{ fontSize: "20px", mb: 1, fontFamily: "Trafik" }}>
             برنامه نویس سیدسجاد موسوی
           </Typography>
-          <Box width={"200px"} height={"200px"}>
+          <Box width={"300px"} height={"300px"}>
             <QrScanner
               onDecode={(result) => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions
@@ -147,7 +143,7 @@ function App() {
             مجموع تعداد بلیط ها: {numbersArray.length}
           </Typography>{" "}
         </Box>
-        <Box mt={4} sx={{ overflowY: "auto" }} ref={listRef}>
+        <Box mt={2} sx={{ overflowY: "auto" }} ref={listRef}>
           {numbersArray.length !== 0 && (
             <Box overflow={"auto"}>
               <Box
@@ -173,7 +169,7 @@ function App() {
                     borderBottom: "1px solid black",
                   }}
                 >
-                  <Box style={{ fontFamily: "Trafik" }}>{item}</Box>
+                  <Box sx={{ fontFamily: "Trafik" }}>{item}</Box>
                   <Button
                     variant="contained"
                     onClick={() => removeTicket(index)}
